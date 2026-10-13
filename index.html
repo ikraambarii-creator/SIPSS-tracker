@@ -1,0 +1,403 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#FFFFFF"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"></head><body>
+<title>SIPSS 2027 Tracker</title>
+<style>
+/* Layout: LinkedIn-style three columns — profile rail | phase feed | stats rail; one column on phones */
+:root{
+  --bg:#F4F2EE; --card:#FFFFFF; --line:#E0DFDC; --fg:rgba(0,0,0,.9); --muted:rgba(0,0,0,.6);
+  --blue:#0A66C2; --blue-soft:#E8F1FB; --green:#057642; --green-soft:#E6F2EA; --amber:#915907; --amber-soft:#FCEFD9; --red:#B24020;
+  --track:#E9E5DF; --cover:linear-gradient(120deg,#A0B4B7,#0A66C2);
+  --font:-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue","Fira Sans",Ubuntu,Oxygen,"Oxygen Sans",Cantarell,"Droid Sans","Apple Color Emoji","Segoe UI Emoji",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --card:#1B1F23; --line:#38434F; --fg:rgba(255,255,255,.9); --muted:rgba(255,255,255,.6);
+  --blue:#71B7FB; --blue-soft:#1E2A36; --green:#7FC15E; --green-soft:#1D2B1F; --amber:#E7A33E; --amber-soft:#2E2617; --red:#F5987E;
+  --track:#2F3940; --cover:linear-gradient(120deg,#38434F,#0A4A8C); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#000000; --card:#1B1F23; --line:#38434F; --fg:rgba(255,255,255,.9); --muted:rgba(255,255,255,.6);
+  --blue:#71B7FB; --blue-soft:#1E2A36; --green:#7FC15E; --green-soft:#1D2B1F; --amber:#E7A33E; --amber-soft:#2E2617; --red:#F5987E;
+  --track:#2F3940; --cover:linear-gradient(120deg,#38434F,#0A4A8C); color-scheme:dark}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--fg);font:14px/1.42 var(--font)}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1128px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:4px;background:var(--blue);color:var(--card);font-weight:700;display:grid;place-items:center;font-size:15px;flex:none}
+.nav h1{font-size:16px;margin:0;font-weight:600}
+.save{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+.save.ok{color:var(--green)}
+.wrap{max-width:1128px;margin:0 auto;padding-inline:16px;padding-block:20px 40px;display:grid;grid-template-columns:225px minmax(0,1fr) 300px;gap:24px;align-items:start}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.pad{padding:12px 16px}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + 66px);display:grid;gap:8px}
+.cover{height:56px;background:var(--cover)}
+.avatar{width:72px;height:72px;border-radius:50%;border:2px solid var(--card);background:var(--blue-soft);color:var(--blue);font-size:28px;font-weight:600;display:grid;place-items:center;margin:-38px auto 0}
+.who{text-align:center;padding:8px 16px 16px;border-bottom:1px solid var(--line)}
+.who b{display:block;font-size:16px}
+.who span{color:var(--muted);font-size:12px}
+.stat{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);padding:6px 16px}
+.stat b{color:var(--blue);font-variant-numeric:tabular-nums}
+.big{font-size:40px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.bar{height:8px;border-radius:4px;background:var(--track);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--green);border-radius:4px;transition:width .3s}
+.bar.blue i{background:var(--blue)}
+h2{font-size:16px;font-weight:600;margin:0 0 8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.feed{display:grid;gap:8px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--muted);color:var(--muted);background:transparent;border-radius:16px;padding:4px 12px;font:600 14px var(--font);cursor:pointer}
+.chip:hover{background:var(--blue-soft)}
+.chip[aria-pressed="true"]{background:var(--green);border-color:var(--green);color:var(--card)}
+.chip:focus-visible,.item input:focus-visible,.toggle input:focus-visible,.phase-head:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.toggle{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin-top:10px;cursor:pointer}
+.phase-head{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;cursor:pointer;background:none;border:0;width:100%;text-align:left;color:inherit;font:inherit}
+.num{width:48px;height:48px;border-radius:4px;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-weight:700;font-size:18px;flex:none}
+.done .num{background:var(--green-soft);color:var(--green)}
+.ph-t{flex:1;min-width:0}
+.ph-t b{font-size:15px;display:block}
+.pill{display:inline-block;font-size:12px;font-weight:600;border-radius:4px;padding:1px 8px;margin-left:6px;vertical-align:1px}
+.pill.now{background:var(--blue);color:var(--card)}
+.pill.late{background:var(--amber-soft);color:var(--amber)}
+.pill.ok{background:var(--green-soft);color:var(--green)}
+.ph-bar{display:flex;align-items:center;gap:10px;margin-top:8px}
+.ph-bar .bar{flex:1}
+.pct{font-weight:600;font-size:13px;font-variant-numeric:tabular-nums;min-width:38px;text-align:right}
+.chev{color:var(--muted);transition:transform .2s;font-size:18px;line-height:1}
+.collapsed .chev{transform:rotate(-90deg)}
+.collapsed .items,.collapsed .ev{display:none}
+.ev{margin:0 16px 8px;padding:8px 12px;border-radius:4px;background:var(--amber-soft);color:var(--amber);font-size:13px}
+.items{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.item{display:flex;gap:12px;align-items:flex-start;padding:10px 16px;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item:hover{background:var(--bg)}
+.item input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--green);flex:none;cursor:pointer}
+.item label{flex:1;min-width:0;cursor:pointer}
+.item .t{display:block}
+.item.is-done .t{color:var(--muted);text-decoration:line-through}
+.meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px;font-size:12px;color:var(--muted)}
+.tag{border-radius:4px;padding:0 6px;background:var(--bg);border:1px solid var(--line)}
+.tag.prio{background:var(--blue-soft);color:var(--blue);border-color:transparent;font-weight:600}
+.empty{padding:12px 16px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+.cat{display:grid;gap:4px;padding:8px 0;border-bottom:1px solid var(--line)}
+.cat:last-child{border-bottom:0}
+.cat-row{display:flex;justify-content:space-between;font-size:13px}
+.cat-row span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
+.cd{display:flex;justify-content:space-between;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--line);font-size:13px}
+.cd:last-child{border-bottom:0}
+.cd b{font-size:18px;font-variant-numeric:tabular-nums;color:var(--blue)}
+.note{font-size:12px;color:var(--muted);line-height:1.5}
+.day-head{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 16px}
+.day-head h2{margin:0;flex:1;min-width:180px}
+.nb{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:16px;padding:4px 12px;font:600 13px var(--font);cursor:pointer}
+.nb:hover{background:var(--blue-soft)}
+.nb:focus-visible,#dayPick:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+#dayPick{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:4px;padding:3px 6px;font:13px var(--font)}
+.grp{padding:6px 16px;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);border-top:1px solid var(--line);background:var(--bg)}
+.grp.late{color:var(--amber)}
+.tabs{display:none}
+.nav-pct{display:none;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums}
+@media (max-width:991px){
+  .wrap{grid-template-columns:minmax(0,1fr);gap:8px;padding-block:8px 96px}
+  .side{position:static}
+  body:not([data-view="today"]) [data-tab="today"],
+  body:not([data-view="timeline"]) [data-tab="timeline"],
+  body:not([data-view="progress"]) [data-tab="progress"]{display:none}
+  .nav-pct{display:inline}
+  .tabs{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .tabs button{flex:1;min-height:56px;border:0;background:none;color:var(--muted);font:600 12px var(--font);display:grid;place-items:center;gap:2px;padding:6px 0;cursor:pointer;border-top:2px solid transparent}
+  .tabs button[aria-current="page"]{color:var(--fg);border-top-color:var(--fg)}
+  .tabs svg{width:24px;height:24px}
+  .day-head h2{flex-basis:100%;font-size:17px}
+  .nb{min-height:40px;min-width:44px}
+  #dayPick{min-height:40px;flex:1;min-width:0}
+  .save{font-size:11px;width:72px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right}
+  .nav h1{font-size:15px}
+  .item{padding:12px 16px}
+  .item input{width:22px;height:22px}
+}
+.tabs button:focus-visible{outline:2px solid var(--blue);outline-offset:-2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<header class="nav"><div class="nav-in">
+  <span class="save" id="save">Memuat progres…</span>
+  <span class="nav-pct" id="navPct">0%</span>
+</div></header>
+
+<main class="wrap">
+  <aside class="side left" data-tab="progress">
+    <div class="card">
+      <div class="pad">
+        <div class="small muted">Total progres</div>
+        <div class="big" id="totalPct">0%</div>
+        <div class="bar" style="margin-top:8px"><i id="totalBar" style="width:0"></i></div>
+      </div>
+      <div class="stat">Selesai <b id="sDone">0</b></div>
+      <div class="stat">Sisa <b id="sLeft">0</b></div>
+      <div class="stat" style="padding-bottom:12px">Prioritas tersisa <b id="sPrio">0</b></div>
+    </div>
+  </aside>
+
+  <section class="feed" aria-label="Timeline persiapan">
+    <div class="card pad" data-tab="timeline">
+      <div class="chips" id="chips" role="group" aria-label="Filter kategori"></div>
+      <label class="toggle"><input type="checkbox" id="hideDone"> Sembunyikan yang sudah selesai</label>
+    </div>
+    <div class="card" id="day" data-tab="today"></div>
+    <div id="phases" class="feed" data-tab="timeline"></div>
+  </section>
+
+  <aside class="side right" data-tab="progress">
+    <div class="card pad">
+      <h2>Hitung mundur</h2>
+      <div id="countdown"></div>
+    </div>
+    <div class="card pad">
+      <h2>Progres per kategori</h2>
+      <div id="cats"></div>
+    </div>
+    <div class="card pad note">
+      Acuan: Pengumuman Kapolri No. Peng/1/I/DIK.2.1/2026 (SIPSS TA 2026). Tanggal fase 4–5 perkiraan; sesuaikan setelah pengumuman TA 2027 terbit.
+    </div>
+  </aside>
+</main>
+
+<nav class="tabs" id="tabs" aria-label="Menu">
+  <button data-v="today"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 4h-2V2h-2v2H9V2H7v2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 15H5V9h14v10zm-9-2.6-3-3 1.4-1.4 1.6 1.6 4.6-4.6L16 10.4z"/></svg>Hari ini</button>
+  <button data-v="timeline"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 5h3v3H4zm5 .5h11v2H9zM4 10.5h3v3H4zm5 .5h11v2H9zM4 16h3v3H4zm5 .5h11v2H9z"/></svg>Timeline</button>
+  <button data-v="progress"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 20V10h3v10zm6.5 0V4h3v16zM17 20v-7h3v7z"/></svg>Progres</button>
+</nav>
+
+<script>
+const CATS={c1:"Kelayakan",c2:"Dokumen",c3:"Jasmani",c4:"Kesehatan",c5:"Akademik & Psikologi",c6:"Pendaftaran & Seleksi"};
+const PHASES=[
+  {id:"p1",title:"Akhir internship di Tidore",from:"2026-10-13",to:"2026-10-26",sub:"Cek kelayakan dan urus dokumen yang bisa diminta jarak jauh"},
+  {id:"p2",title:"Pulang ke Merauke: dokumen & kesehatan",from:"2026-10-27",to:"2026-11-30",sub:"Legalisir, MCU, mulai latihan jasmani terstruktur",ev:"ACLS PERKI 10–12 Nov 2026: atur latihan di sekitar tanggal ini."},
+  {id:"p3",title:"Persiapan intensif",from:"2026-12-01",to:"2026-12-31",sub:"Psikotes, TKK, mental ideologi, simulasi jasmani; dokumen yang ada masa berlakunya"},
+  {id:"p4",title:"Pengumuman & pendaftaran",from:"2027-01-01",to:"2027-01-31",sub:"Perkiraan: pengumuman TA 2026 terbit 14 Januari"},
+  {id:"p5",title:"Seleksi Panda & Pusat",from:"2027-02-01",to:"2027-06-30",sub:"Mengikuti jadwal resmi panitia"}
+];
+// [id, kategori, fase, teks, catatan, prioritas]
+const ITEMS=[
+ ["k1","c1","p1","Pastikan S-1 Kedokteran dibuka & wilayah Polda Merauke masuk jalur khusus TA 2027","TA 2026: Polda Papua, Papua Barat, Papua Barat Daya, Papua Tengah, Malut, Gorontalo, Sulbar, NTT, Kaltara (poin 4b-4). Papua Selatan tidak tercantum.",1],
+ ["k2","c1","p1","Hitung usia: maks 28 tahun saat pembukaan pendidikan","Poin 4e-3, S-1 Profesi",1],
+ ["k4","c1","p1","Siap wajib tugas min 5 tahun di Polda penugasan","Poin 4i",0],
+ ["k5","c1","p1","Tinggi badan min 162 cm & berat badan seimbang","Poin 4f",0],
+ ["k6","c1","p1","Belum menikah & sanggup tidak menikah selama pendidikan","Poin 4g",0],
+ ["k7","c1","p1","IPK min 3,0 & akreditasi prodi min B/Sangat Baik pada tahun lulus","Poin 4c",0],
+ ["k8","c1","p1","Tidak terikat ikatan dinas instansi lain (beasiswa/pemda)","Poin 4a & 4k",0],
+ ["k9","c1","p1","Siap Ikatan Dinas Pertama 10 tahun","Poin 4h",0],
+ ["k10","c1","p1","Bukan anggota/mantan Polri/TNI/PNS, belum pernah ikut pendidikan Polri/TNI","Poin 4a",0],
+ ["k11","c1","p1","Bersedia ditempatkan di seluruh NKRI & Satker sesuai kompetensi","Poin 3h & 4j",0],
+ ["d5","c2","p1","Minta legalisir ijazah S-1 + profesi + transkrip (kampus & Wakil Dekan Akademik)","Ajukan sekarang, prosesnya bisa lama. Asli + fotokopi 2 rangkap.",1],
+ ["d6","c2","p1","Sertifikat akreditasi BAN-PT prodi, dilegalisir","Yang ber-barcode tidak perlu legalisir",0],
+ ["k3","c1","p2","Tanya Biro SDM Polda: Merauke masuk Polda mana & apakah dibuka jalur khusus","",1],
+ ["d1","c2","p2","Pastikan NIK terdaftar & sinkron di Disdukcapil","Dipakai saat registrasi online",1],
+ ["d2","c2","p2","KTP + KK, legalisir Disdukcapil","KK ber-barcode tidak perlu legalisir",0],
+ ["d3","c2","p2","Akte kelahiran, legalisir Disdukcapil","Ber-barcode tidak perlu legalisir",0],
+ ["d4","c2","p2","Ijazah SD, SMP, SMA dilegalisir sekolah penerbit","",0],
+ ["d13","c2","p2","Jika sudah bekerja: surat persetujuan instansi + pernyataan berhenti bila lulus","Poin 4l",0],
+ ["h1","c4","p2","Medical check-up mandiri lengkap","",1],
+ ["h2","c4","p2","Mata: visus & tes buta warna","",0],
+ ["h3","c4","p2","Gigi: cek & selesaikan perawatan karies/gigi hilang","",0],
+ ["h4","c4","p2","THT","",0],
+ ["h5","c4","p2","Skrining varikokel, hernia, hemoroid, varises","",0],
+ ["h6","c4","p2","Kulit / tato","",0],
+ ["h7","c4","p2","Postur & tulang belakang","",0],
+ ["h8","c4","p2","Jantung & paru (EKG, foto toraks)","",0],
+ ["h9","c4","p2","Lab dasar & urin","",0],
+ ["j1","c3","p2","Lari 12 menit tembus 3,5 km","Kesamaptaan A. Nilai kumulatif jasmani min 41.",1],
+ ["j2","c3","p2","Kesamaptaan B: pull-up sesuai target","",0],
+ ["j3","c3","p2","Kesamaptaan B: sit-up sesuai target","",0],
+ ["j4","c3","p2","Kesamaptaan B: push-up sesuai target","",0],
+ ["j5","c3","p2","Kesamaptaan B: shuttle run sesuai target","",0],
+ ["j6","c3","p2","Renang: teknik & jarak nyaman","",0],
+ ["a1","c5","p3","Latihan psikotes CAT: kecerdasan, kecermatan, kepribadian","Batas lulus nilai 61",1],
+ ["a2","c5","p3","Review TKK pengetahuan kedokteran umum","Bahan UKMPPD bisa dipakai",0],
+ ["a3","c5","p3","Latih TKK praktik: keterampilan klinis","",0],
+ ["a4","c5","p3","Mental Ideologi: wawasan kebangsaan, Pancasila, UUD 1945, NKRI","",0],
+ ["a5","c5","p3","Siapkan jawaban wawancara psikotes II & PMK","Motivasi masuk Polri, alasan memilih bedah, kesiapan bertugas di Papua",0],
+ ["h10","c4","p3","Persiapan tes kesehatan jiwa","",0],
+ ["j7","c3","p3","Antropometri: jaga postur & proporsi BB/TB","",0],
+ ["j8","c3","p3","Simulasi tes jasmani lengkap (A, B, renang)","",0],
+ ["d7","c2","p3","SKCK dari Polres, dilegalisir","Harus masih berlaku saat pendaftaran",0],
+ ["d8","c2","p3","Surat keterangan bebas narkoba","",0],
+ ["d9","c2","p3","Pas foto berwarna 4x6 latar merah, 10 lembar","",0],
+ ["k12","c1","p4","Cek pengumuman resmi SIPSS TA 2027","penerimaan.polri.go.id",1],
+ ["d10","c2","p4","Unduh & isi 7 formulir dari penerimaan.polri.go.id","Persetujuan ortu/wali, permohonan tulisan tangan, belum menikah, perjanjian IDP, tidak terikat instansi lain, pernyataan ortu, anti-KKN & tanpa sponsorship",0],
+ ["d12","c2","p4","Surat pernyataan bermeterai siap tugas 5 tahun di Polda","Jalur poin 4b-4",0],
+ ["t1","c6","p4","Cek teliti semua data form registrasi sebelum submit","Poin 5c–d",0],
+ ["t2","c6","p4","Registrasi online, pilih jalur SIPSS","",1],
+ ["t3","c6","p4","Simpan nomor registrasi, username & password","Pantau dashboard pendaftar",0],
+ ["d11","c2","p4","Cetak daftar riwayat hidup (form registrasi online)","",0],
+ ["d14","c2","p4","Fotokopi semua berkas 2 rangkap & susun sesuai urutan","",0],
+ ["t4","c6","p4","Verifikasi di Polda: datang sendiri, bawa asli + fotokopi","Tidak bisa diwakilkan",0],
+ ["t5","c6","p4","Ukur TB/BB & ambil nomor ujian dari Panda","Poin 6c–d",0],
+ ["t6","c6","p5","Ikuti seleksi tingkat Panda","Administrasi, kesehatan I–II, psikotes, TKK, MI, jasmani, PMK",1],
+ ["t7","c6","p5","Ikuti seleksi tingkat Pusat (Akpol Semarang)","Termasuk TKK praktik",1],
+ ["t8","c6","p5","Tolak setiap tawaran bantuan kelulusan atau sponsor","Seleksi gratis; laporkan lewat WBS SDM Polri",0]
+];
+
+// Agenda harian: rutinitas per hari-minggu + tugas checklist bertanggal + tugas tambahan
+const WEEK={
+ 1:["Lari interval: pemanasan 10 mnt, 6×400 m cepat, jalan 2 mnt di antaranya","TKK kedokteran (Anki) 2 jam","Psikotes kecermatan 30 mnt"],
+ 2:["Sirkuit kekuatan: pull-up, push-up, sit-up 4 set + shuttle run 5×","TKK kedokteran 2 jam","Mental ideologi 30 mnt (Pancasila, UUD 1945, NKRI)"],
+ 3:["Renang 45 mnt (teknik + jarak)","Psikotes kecerdasan 1 jam","TKK kedokteran 1 jam"],
+ 4:["Tempo run 25–30 mnt di pace target","TKK kedokteran 2 jam","Psikotes kecermatan 30 mnt"],
+ 5:["Sirkuit kekuatan + shuttle run 5×","Latihan keterampilan klinis (TKK praktik) 1 jam","Mental ideologi 30 mnt"],
+ 6:["Lari santai 40–50 mnt","Tryout CAT psikotes/TKK 1 sesi + bahas yang salah","Renang ringan 30 mnt"],
+ 0:["Istirahat aktif: jalan atau peregangan","Check-in mingguan: BB, jarak lari, pull-up/push-up/sit-up, jam belajar, skor tryout, pengeluaran","Susun rencana minggu depan"]};
+const AGENDA={
+ "2026-10-13":["k2","k7","k10"],"2026-10-14":["d5","d6"],"2026-10-15":["k1","k8"],"2026-10-16":["k4","k5","k6","k9","k11"],
+ "2026-11-02":["d1"],"2026-11-03":["d2","d3"],"2026-11-04":["k3","d4"],"2026-11-05":["h1","h8","h9"],"2026-11-06":["h2","h4"],
+ "2026-11-16":["h3"],"2026-11-17":["h5","h6","h7"],"2026-11-18":["d13"],
+ "2026-12-07":["d9"],"2026-12-14":["d7"],"2026-12-19":["j8"],"2026-12-28":["h10","j7"],
+ "2027-01-04":["d8"],"2027-01-05":["k12"],"2027-01-15":["d10","d12","t1"],"2027-01-16":["t2","t3","d11"],"2027-01-18":["d14"],"2027-01-20":["t4","t5"]};
+const EXTRA={
+ "2026-10-17":["Tes Cooper 12 menit, catat jarak di Strava"],"2026-10-22":["Jual BMX sebelum meninggalkan Tidore"],"2026-10-26":["Hari terakhir internship"],
+ "2026-11-07":["Tes Cooper 12 menit, catat jarak di Strava"],"2026-11-10":["ACLS PERKI hari 1"],"2026-11-11":["ACLS PERKI hari 2"],"2026-11-12":["ACLS PERKI hari 3"],
+ "2026-11-21":["Tes Cooper 12 menit, catat jarak di Strava"],"2026-11-30":["Evaluasi fase 2: dokumen & MCU sudah beres semua?"],
+ "2026-12-05":["Tes Cooper 12 menit, catat jarak di Strava"],"2026-12-31":["Evaluasi fase 3: skor tryout & jasmani sudah sesuai target?"],
+ "2027-01-02":["Tes Cooper 12 menit, catat jarak di Strava"]};
+function routine(d){
+  const w=new Date(d+"T00:00:00").getDay();
+  if(d>="2026-11-09"&&d<="2026-11-13")return["Fokus ACLS; lari ringan 20 mnt bila sempat"];
+  if(d>="2026-10-27"&&d<="2026-11-01")return["Masa pindahan: lari ringan 20–30 mnt bila sempat","Anki 30 mnt"];
+  if(d<="2026-10-26"&&w)return["Latihan 30–45 mnt di luar jam jaga: "+WEEK[w][0].split(":")[0].toLowerCase(),"Anki TKK 30–45 mnt, sesuaikan dengan shift"];
+  return WEEK[w];
+}
+const addDays=(d,n)=>{const x=new Date(d+"T12:00:00");x.setDate(x.getDate()+n);return x.toLocaleDateString("sv-SE")};
+const byId=Object.fromEntries(ITEMS.map(i=>[i[0],i]));
+let daily={}, cur=null;
+// Items ticked in this view stay in place until the view changes, so rows never jump under the finger.
+const keep=new Set();
+
+const $=id=>document.getElementById(id);
+let done={}, filter="all", collapsed={};
+const todayISO=()=>new Date().toLocaleDateString("sv-SE",{timeZone:"Asia/Jayapura"});
+const fmt=d=>new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"numeric",month:"short",year:"numeric"});
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+try{collapsed=JSON.parse(localStorage.getItem("sipss-collapsed")||"{}")}catch(e){}
+try{$("hideDone").checked=localStorage.getItem("sipss-hide")==="1"}catch(e){}
+
+function renderDay(){
+  const today=todayISO(); cur=cur||today;
+  const ph=PHASES.find(p=>cur>=p.from&&cur<=p.to);
+  const row=(id,text,on,meta)=>`<li class="item ${on?"is-done":""}"><input type="checkbox" id="dy-${id}" data-day="${id}" ${on?"checked":""}>
+    <label for="dy-${id}"><span class="t">${text}</span>${meta?`<span class="meta">${meta}</span>`:""}</label></li>`;
+  const late=cur===today?Object.entries(AGENDA).filter(([d])=>d<today).flatMap(([,ids])=>ids).filter(id=>!done[id]||keep.has(id)):[];
+  const ag=AGENDA[cur]||[], ex=EXTRA[cur]||[], rt=routine(cur);
+  const keys=[...ag.map(id=>!!done[id]),...ex.map((_,i)=>!!daily[cur+"#x"+i]),...rt.map((_,i)=>!!daily[cur+"#"+i])];
+  const dn=keys.filter(Boolean).length;
+  const item=id=>row("c:"+id,byId[id][3],done[id],`${byId[id][5]?'<span class="tag prio">Prioritas</span>':""}<span class="tag">${CATS[byId[id][1]]}</span>${byId[id][4]?`<span>${byId[id][4]}</span>`:""}`);
+  $("day").innerHTML=`<div class="day-head">
+      <h2>${new Date(cur+"T00:00:00").toLocaleDateString("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric"})}${cur===today?'<span class="pill now">Hari ini</span>':""}</h2>
+      <button class="nb" data-nav="-1" aria-label="Hari sebelumnya">‹</button>
+      <button class="nb" data-nav="0">Hari ini</button>
+      <button class="nb" data-nav="1" aria-label="Hari berikutnya">›</button>
+      <input type="date" id="dayPick" value="${cur}" aria-label="Pilih tanggal">
+    </div>
+    <div class="pad" style="padding-top:0">
+      <div class="small muted">${ph?`Fase ${PHASES.indexOf(ph)+1}: ${ph.title}`:"Di luar rentang timeline"} · ${dn} dari ${keys.length} tugas hari ini</div>
+      <div class="ph-bar"><div class="bar blue"><i style="width:${pct(dn,keys.length)}%"></i></div><span class="pct">${pct(dn,keys.length)}%</span></div>
+    </div>
+    <ul class="items">
+      ${late.length?`<li class="grp late">Tertunda dari hari sebelumnya (${late.length})</li>${late.map(item).join("")}`:""}
+      ${ag.length||ex.length?`<li class="grp">Urusan hari ini</li>${ag.map(item).join("")}${ex.map((t,i)=>row("d:"+cur+"#x"+i,t,daily[cur+"#x"+i])).join("")}`:""}
+      <li class="grp">Latihan & belajar</li>${rt.map((t,i)=>row("d:"+cur+"#"+i,t,daily[cur+"#"+i])).join("")}
+    </ul>`;
+}
+
+function render(){
+  renderDay();
+  const today=todayISO(), hide=$("hideDone").checked;
+  const n=ITEMS.length, d=ITEMS.filter(i=>done[i[0]]).length;
+  $("totalPct").textContent=$("navPct").textContent=pct(d,n)+"%"; $("totalBar").style.width=pct(d,n)+"%";
+  $("sDone").textContent=d; $("sLeft").textContent=n-d;
+  $("sPrio").textContent=ITEMS.filter(i=>i[5]&&!done[i[0]]).length;
+
+  $("chips").innerHTML=[["all","Semua"],...Object.entries(CATS)].map(([k,v])=>
+    `<button class="chip" data-f="${k}" aria-pressed="${filter===k}">${v}</button>`).join("");
+
+  $("phases").innerHTML=PHASES.map((p,ix)=>{
+    const all=ITEMS.filter(i=>i[2]===p.id), dn=all.filter(i=>done[i[0]]).length;
+    const shown=all.filter(i=>(filter==="all"||i[1]===filter)&&!(hide&&done[i[0]]&&!keep.has(i[0])));
+    const complete=dn===all.length, now=today>=p.from&&today<=p.to, late=today>p.to&&!complete;
+    const pill=complete?'<span class="pill ok">Selesai</span>':now?'<span class="pill now">Sekarang</span>':late?`<span class="pill late">${all.length-dn} tertinggal</span>`:"";
+    return `<article class="card ${complete?"done":""} ${collapsed[p.id]?"collapsed":""}">
+      <button class="phase-head" data-p="${p.id}" aria-expanded="${!collapsed[p.id]}">
+        <div class="num">${ix+1}</div>
+        <div class="ph-t"><b>${p.title}${pill}</b>
+          <div class="small muted">${fmt(p.from)} – ${fmt(p.to)} · ${p.sub}</div>
+          <div class="ph-bar"><div class="bar blue"><i style="width:${pct(dn,all.length)}%"></i></div><span class="pct">${pct(dn,all.length)}%</span></div>
+          <div class="small muted">${dn} dari ${all.length} selesai</div>
+        </div>
+        <span class="chev" aria-hidden="true">⌄</span>
+      </button>
+      ${p.ev?`<div class="ev">${p.ev}</div>`:""}
+      <ul class="items">${shown.map(i=>`<li class="item ${done[i[0]]?"is-done":""}">
+        <input type="checkbox" id="cb-${i[0]}" data-id="${i[0]}" ${done[i[0]]?"checked":""}>
+        <label for="cb-${i[0]}"><span class="t">${i[3]}</span>
+          <span class="meta">${i[5]?'<span class="tag prio">Prioritas</span>':""}<span class="tag">${CATS[i[1]]}</span>${i[4]?`<span>${i[4]}</span>`:""}</span>
+        </label></li>`).join("")||`<li class="empty">Tidak ada item untuk filter ini.</li>`}</ul>
+    </article>`}).join("");
+
+  $("cats").innerHTML=Object.entries(CATS).map(([k,v])=>{
+    const all=ITEMS.filter(i=>i[1]===k), dn=all.filter(i=>done[i[0]]).length;
+    return `<div class="cat"><div class="cat-row"><span>${v}</span><span>${dn}/${all.length} · ${pct(dn,all.length)}%</span></div><div class="bar"><i style="width:${pct(dn,all.length)}%"></i></div></div>`}).join("");
+
+  const days=t=>Math.ceil((new Date(t+"T00:00:00")-new Date(today+"T00:00:00"))/864e5);
+  $("countdown").innerHTML=[["Internship selesai","2026-10-26"],["ACLS PERKI","2026-11-10"],["Perkiraan pengumuman","2027-01-14"]]
+    .map(([l,t])=>{const x=days(t);return `<div class="cd"><span>${l}<br><span class="small muted">${fmt(t)}</span></span><b>${x>0?x+" hari":x===0?"Hari ini":"Lewat"}</b></div>`}).join("");
+}
+
+$("chips").addEventListener("click",e=>{const b=e.target.closest("[data-f]");if(b){filter=b.dataset.f;keep.clear();render()}});
+$("hideDone").addEventListener("change",()=>{keep.clear();try{localStorage.setItem("sipss-hide",$("hideDone").checked?"1":"0")}catch(e){}render()});
+$("phases").addEventListener("click",e=>{const h=e.target.closest("[data-p]");if(!h)return;
+  collapsed[h.dataset.p]=!collapsed[h.dataset.p];try{localStorage.setItem("sipss-collapsed",JSON.stringify(collapsed))}catch(e){}render()});
+$("phases").addEventListener("change",e=>{const id=e.target.dataset.id;if(!id)return;
+  keep.add(id);if(e.target.checked)done[id]=todayISO();else delete done[id];render();queueSave()});
+
+function setView(v){document.body.dataset.view=v;
+  document.querySelectorAll("#tabs button").forEach(b=>b.dataset.v===v?b.setAttribute("aria-current","page"):b.removeAttribute("aria-current"));
+  keep.clear();if(cur)render();
+  try{localStorage.setItem("sipss-view",v)}catch(e){}window.scrollTo(0,0)}
+$("tabs").addEventListener("click",e=>{const b=e.target.closest("[data-v]");if(b)setView(b.dataset.v)});
+let v0="today";try{v0=localStorage.getItem("sipss-view")||"today"}catch(e){}
+setView(v0);
+$("day").addEventListener("click",e=>{const b=e.target.closest("[data-nav]");if(!b)return;
+  cur=b.dataset.nav==="0"?todayISO():addDays(cur,+b.dataset.nav);keep.clear();render()});
+$("day").addEventListener("change",e=>{
+  if(e.target.id==="dayPick"){if(e.target.value){cur=e.target.value;keep.clear();render()}return}
+  const k=e.target.dataset.day;if(!k)return;const id=k.slice(2),on=e.target.checked;keep.add(id);
+  if(k[0]==="c"){if(on)done[id]=todayISO();else delete done[id]}else{if(on)daily[id]=true;else delete daily[id]}
+  render();queueSave()});
+
+// Saving: shared db doc (survives devices and is readable by Claude); localStorage is the offline fallback.
+let ref=null, timer=null, chain=Promise.resolve(), dirty=false;
+const status=(t,ok)=>{$("save").textContent=t;$("save").className="save"+(ok?" ok":"")};
+function local(){try{localStorage.setItem("sipss-done",JSON.stringify(done));localStorage.setItem("sipss-daily",JSON.stringify(daily))}catch(e){}}
+function queueSave(){dirty=true;local();status("Menyimpan…");clearTimeout(timer);timer=setTimeout(()=>{
+  const body={done:{...done},daily:{...daily},updatedAt:new Date().toISOString()};
+  if(!ref){dirty=false;status("Tersimpan",true);return}
+  chain=chain.then(()=>ref.set(body)).then(()=>{dirty=false;status("Tersimpan",true)})
+    .catch(()=>status("Gagal menyimpan ke cloud — tersimpan di perangkat ini"))},600)}
+
+try{done=JSON.parse(localStorage.getItem("sipss-done")||"{}");daily=JSON.parse(localStorage.getItem("sipss-daily")||"{}")}catch(e){}
+render();
+(async()=>{
+  const db=window.claude?await window.claude.use("db"):null;
+  if(!db){status("Tersimpan di perangkat ini",true);return}
+  ref=db.doc("progress/main");
+  ref.onSnapshot(s=>{if(dirty)return;
+    if(s.exists){const d=s.data(),nd=d.done||{},ny=d.daily||{};
+      // skip the echo of our own save: re-rendering mid-tap is what moves rows on iPhone
+      if(JSON.stringify(nd)!==JSON.stringify(done)||JSON.stringify(ny)!==JSON.stringify(daily)){done={...nd};daily={...ny};local();render()}
+      status("Tersimpan",true)}
+    else if(Object.keys(done).length||Object.keys(daily).length)queueSave(); // carry device-only ticks into the cloud once
+    else status("Tersimpan",true)},
+    ()=>status("Koneksi cloud terputus — tersimpan di perangkat ini"));
+})();
+</script>
+
+<script>if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}))</script></body></html>
